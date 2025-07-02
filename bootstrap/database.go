@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/mongo"
 )
 
 func NewMongoDatabase(env *Env) mongo.Client {

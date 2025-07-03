@@ -7,22 +7,21 @@ import (
 	"gorm.io/gorm"
 )
 
-func GormPgSql() *gorm.DB {
+func GormPgSql(env *Env) *gorm.DB {
 
-	p := ENV.Pgsql
-	if p.Dbname == "" {
+	if env.DBName == "" {
 		return nil
 	}
 	// https://github.com/go-gorm/postgres
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: p.Dsn(),
+		DSN: env.pgsqlDsn(),
 
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage
 	}), &gorm.Config{})
 
 	if err != nil {
 
-		log.Println(p.DriverName, err)
+		log.Println(env.DBType, err)
 	}
 	return db
 }

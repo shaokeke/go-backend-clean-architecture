@@ -2,52 +2,28 @@ package repository
 
 import (
 	"context"
+	"gorm.io/gorm"
 
 	"github.com/amitshekhariitbhu/go-backend-clean-architecture/domain"
-	"github.com/amitshekhariitbhu/go-backend-clean-architecture/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type taskRepository struct {
-	database   mongo.Database
-	collection string
+	database *gorm.DB
 }
 
-func NewTaskRepository(db mongo.Database, collection string) domain.TaskRepository {
+func NewTaskRepository(db *gorm.DB) domain.TaskRepository {
 	return &taskRepository{
-		database:   db,
-		collection: collection,
+		database: db,
 	}
 }
 
 func (tr *taskRepository) Create(c context.Context, task *domain.Task) error {
-	collection := tr.database.Collection(tr.collection)
-
-	_, err := collection.InsertOne(c, task)
-
+	err := tr.database.Create(&task).Error
 	return err
 }
 
-func (tr *taskRepository) FetchByUserID(c context.Context, userID string) ([]domain.Task, error) {
-	collection := tr.database.Collection(tr.collection)
-
+func (tr *taskRepository) FetchByUserID(c context.Context, userID uint) ([]domain.Task, error) {
 	var tasks []domain.Task
-
-	idHex, err := primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		return tasks, err
-	}
-
-	cursor, err := collection.Find(c, bson.M{"userID": idHex})
-	if err != nil {
-		return nil, err
-	}
-
-	err = cursor.All(c, &tasks)
-	if tasks == nil {
-		return []domain.Task{}, err
-	}
-
+	err := tr.database.Find(&tasks, "user_id = ?", userID).Error
 	return tasks, err
 }

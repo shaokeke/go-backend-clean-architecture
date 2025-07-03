@@ -7,16 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func GormMysql() *gorm.DB {
+func GormMysql(env *Env) *gorm.DB {
 
-	m := ENV.Mysql
-	if m.Dbname == "" {
+	if env.DBName == "" {
 		return nil
 	}
-	db, err := gorm.Open(mysql.Open(m.Dsn()), &gorm.Config{})
-	//db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(env.mysqlDsn()), &gorm.Config{})
 	if err != nil {
-		log.Println(m.DriverName, err)
+		log.Println(env.DBType, err)
 	}
 	return db
 

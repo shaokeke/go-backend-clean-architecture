@@ -10,6 +10,7 @@ type Env struct {
 	AppEnv                 string `mapstructure:"APP_ENV"`
 	ServerAddress          string `mapstructure:"SERVER_ADDRESS"`
 	ContextTimeout         int    `mapstructure:"CONTEXT_TIMEOUT"`
+	DBType                 string `mapstructure:"DB_TYPE"`
 	DBHost                 string `mapstructure:"DB_HOST"`
 	DBPort                 string `mapstructure:"DB_PORT"`
 	DBUser                 string `mapstructure:"DB_USER"`
@@ -40,4 +41,12 @@ func NewEnv() *Env {
 	}
 
 	return &env
+}
+
+func (e *Env) mysqlDsn() string {
+	return e.DBUser + ":" + e.DBPass + "@tcp(" + e.DBHost + ":" + e.DBPort + ")/" + e.DBName + "?" + "charset=utf8mb4&parseTime=True&loc=" + "Local"
+}
+
+func (e *Env) pgsqlDsn() string {
+	return "host=" + e.DBHost + " user=" + e.DBUser + " password=" + e.DBPass + " dbname=" + e.DBName + " port=" + e.DBPort + " sslmode=disable TimeZone=" + "Asia/Shanghai"
 }

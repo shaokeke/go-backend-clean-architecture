@@ -5,7 +5,6 @@ import (
 
 	"github.com/amitshekhariitbhu/go-backend-clean-architecture/domain"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TaskController struct {
@@ -21,14 +20,8 @@ func (tc *TaskController) Create(c *gin.Context) {
 		return
 	}
 
-	userID := c.GetString("x-user-id")
-	task.ID = primitive.NewObjectID()
-
-	task.UserID, err = primitive.ObjectIDFromHex(userID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
-		return
-	}
+	userID := c.GetUint("x-user-id")
+	task.UserID = userID
 
 	err = tc.TaskUsecase.Create(c, &task)
 	if err != nil {
@@ -42,7 +35,7 @@ func (tc *TaskController) Create(c *gin.Context) {
 }
 
 func (u *TaskController) Fetch(c *gin.Context) {
-	userID := c.GetString("x-user-id")
+	userID := c.GetUint("x-user-id")
 
 	tasks, err := u.TaskUsecase.FetchByUserID(c, userID)
 	if err != nil {

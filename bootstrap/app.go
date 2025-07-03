@@ -1,17 +1,24 @@
 package bootstrap
 
+import (
+	"gorm.io/gorm"
+)
+
 type Application struct {
 	Env   *Env
-	Mongo mongo.Client
+	OrmDb *gorm.DB
 }
 
 func App() Application {
 	app := &Application{}
 	app.Env = NewEnv()
-	app.Mongo = NewMongoDatabase(app.Env)
+	app.OrmDb = NewDatabase(app.Env)
 	return *app
+}
+func (app *Application) RegisterTables() {
+	RegisterTables(app.OrmDb)
 }
 
 func (app *Application) CloseDBConnection() {
-	CloseMongoDBConnection(app.Mongo)
+	CloseDBConnection(app.OrmDb)
 }
